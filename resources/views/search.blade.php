@@ -13,10 +13,10 @@
             Temukan cafe dari isi review-nya
         </p>
 
-        {{-- TODO (integrasi): aktifkan link evaluasi setelah modul Anggota 4 jadi --}}
-        {{-- <a href="{{ route('evaluation') }}" class="inline-block mt-3 text-xs font-medium text-primary hover:text-primary-dark">
+        <a href="{{ route('evaluation') }}"
+           class="inline-block mt-3 text-xs font-medium text-primary hover:text-primary-dark">
             Lihat halaman Evaluasi &rarr;
-        </a> --}}
+        </a>
     </header>
 
     {{-- Form pencarian (neumorphic inset) --}}

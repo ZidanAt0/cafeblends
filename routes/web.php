@@ -1,23 +1,18 @@
 <?php
 
+use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Routing CafeBlend (Anggota 5)
+| Routing CafeBlend (hasil integrasi)
 |--------------------------------------------------------------------------
-| Untuk sekarang halaman pencarian hanya menampilkan UI (form + desain),
-| belum ada hasil pencarian karena modul pencarian belum diintegrasikan.
-|
-| Saat INTEGRASI nanti, closure di bawah diganti memanggil SearchController
-| (punya Anggota 3) yang menghitung skor asli pakai TF-IDF + Cosine Similarity:
-|
-|   Route::get('/', [SearchController::class, 'index'])->name('search');
+| Alur lengkap:
+|   '/'           -> SearchController (Angg.3) -> SearchService -> TfidfService
+|                    (Angg.2) -> TextPreprocessor (Angg.1), data dari tabel
+|                    cafes (Angg.5)
+|   '/evaluation' -> EvaluationController (Angg.4) -> EvaluationService
 */
-Route::get('/', function () {
-    return view('search', [
-        'query'   => trim(request('q', '')),
-        'results' => [],     // masih kosong, diisi saat integrasi
-        'elapsed' => 0.0,
-    ]);
-})->name('search');
+Route::get('/', [SearchController::class, 'index'])->name('search');
+Route::get('/evaluation', [EvaluationController::class, 'index'])->name('evaluation');
