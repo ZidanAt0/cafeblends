@@ -1,59 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CafeBlends
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem pencarian (Information Retrieval) review cafe berbasis **TF-IDF** dan **Cosine Similarity**, dibangun dengan **Laravel**. Pengguna memasukkan query bebas (mis. *"cozy cafe with good coffee and dessert"*), sistem melakukan preprocessing, menghitung relevansi tiap dokumen cafe, lalu menampilkan ranking beserta skor relevansinya. Disertai halaman **Evaluasi** (Precision@K, Recall, MAP).
 
-## About Laravel
+> Proyek UAS mata kuliah **Sistem Temu Kembali Informasi (STKI)** — Universitas Lampung.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 👥 Anggota Kelompok
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Nama | NPM | Modul |
+|------|-----|-------|
+| Zidan Ahmad At-Thoriq | 2317051050 | Database, UI & Integrasi |
+| Okta Safitri | 2317051013 | — |
+| Egista Fatmawati | 2357051002 | — |
+| Faiz Ahmad Nadhif | 2357051012 | — |
+| Muhammad Zidane Dako | 2357051005 | — |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## ✨ Fitur
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Pencarian full-text** atas isi review cafe dengan ranking berdasarkan relevansi.
+- **Pipeline STKI manual** (tanpa library IR siap pakai) agar tiap proses dapat dijelaskan:
+  Preprocessing → Indexing (TF-IDF) → Scoring (Cosine Similarity) → Ranking.
+- **Halaman Evaluasi** otomatis: Precision@10, Recall, dan MAP atas query uji + ground truth.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 📂 Dataset
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Sumber:** [Zomato Cafe Reviews — Kaggle](https://www.kaggle.com/datasets/juhibhojani/zomato-cafe-reviews)
+- File: `reviews.csv` (sudah disertakan di repo)
+- 775 review pelanggan · 299 cafe unik · 10 kota
+- **Pemodelan dokumen:** seluruh review milik satu cafe digabung menjadi satu dokumen, lalu hanya cafe dengan **≥100 kata** yang dipakai → **74 dokumen** valid.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🔧 Pipeline STKI
 
-## Contributing
+### 1. Preprocessing — `app/Services/TextPreprocessor.php`
+Case folding → cleaning → tokenizing → stopword removal → stemming.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 2. Indexing (TF-IDF) — `app/Services/TfidfService.php`
+- `TF` = frekuensi term dalam dokumen
+- `IDF = log(N / df)`
+- `bobot = TF × IDF`, disimpan beserta panjang vektor (norm) ke `storage/app/tfidf_index.json`
 
-## Code of Conduct
+### 3. Scoring (Cosine Similarity) — `app/Services/SearchService.php`
+```
+cosine(q, d) = (q · d) / (‖q‖ × ‖d‖)
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Evaluasi — `app/Services/EvaluationService.php`
+Precision@10, Recall, Average Precision (AP), dan MAP atas 13 query uji + ground truth.
 
-## Security Vulnerabilities
+**Hasil:** Precision@10 = **0.846** · Recall = **0.856** · MAP = **0.864**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🚀 Cara Menjalankan
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Prasyarat: PHP 8.2+, Composer, PostgreSQL (mis. via Laragon).
+
+```bash
+# 1. Install dependency
+composer install
+
+# 2. Setup environment
+cp .env.example .env
+php artisan key:generate
+# atur DB_CONNECTION=pgsql, DB_DATABASE=cafeblends, DB_USERNAME, DB_PASSWORD di .env
+# buat database kosong bernama "cafeblends" di PostgreSQL
+
+# 3. Migrasi database
+php artisan migrate
+
+# 4. Import dataset cafe (gabung review, filter ≥100 kata)
+php artisan import:cafes
+
+# 5. Bangun indeks TF-IDF
+php artisan index:build
+
+# 6. Jalankan server
+php artisan serve
+```
+
+Buka `http://127.0.0.1:8000` untuk pencarian, dan `/evaluation` untuk halaman evaluasi.
+
+> Catatan: isi database **tidak** disimpan di Git. Setelah `git pull`, jalankan ulang `migrate` → `import:cafes` → `index:build` untuk membangun data secara identik dari `reviews.csv`.
+
+---
+
+## 🗂️ Struktur Penting
+
+```
+app/
+├── Console/Commands/
+│   ├── ImportCafes.php      # import:cafes — load & grouping dataset
+│   └── BuildIndex.php       # index:build — bangun indeks TF-IDF
+├── Http/Controllers/
+│   ├── SearchController.php
+│   └── EvaluationController.php
+├── Models/Cafe.php
+└── Services/
+    ├── TextPreprocessor.php # preprocessing 5 tahap
+    ├── TfidfService.php     # TF-IDF indexing
+    ├── SearchService.php    # cosine similarity + ranking
+    └── EvaluationService.php# Precision/Recall/MAP
+resources/views/
+├── layouts/app.blade.php
+├── search.blade.php
+└── evaluation.blade.php
+reviews.csv                  # dataset Zomato (Kaggle)
+```
+
+---
+
+## 🛠️ Teknologi
+
+Laravel · PHP 8.2 · PostgreSQL · Tailwind CSS · Blade.
